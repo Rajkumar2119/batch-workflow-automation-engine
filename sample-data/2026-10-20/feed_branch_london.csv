@@ -1,0 +1,7 @@
+txnId,accountId,txnDate,amount,currency,description
+LDN-0001,GB10000001,2026-10-20,120.50,GBP,Card payment - Tesco
+LDN-0002,GB10000002,2026-10-20,45.00,USD,Online subscription
+LDN-0003,GB10000003,2026-10-19,999.99,EUR,Hotel booking
+LDN-0004,GB1000,2026-10-20,10.00,GBP,Bad account id
+LDN-0005,GB10000005,2026-10-20,-5.00,GBP,Negative amount
+LDN-0006,GB10000006,2026-10-20,250.00,GBP,Salary transfer
