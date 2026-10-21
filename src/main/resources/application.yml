@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: batch-workflow-automation-engine
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/batchengine}
+    username: ${DB_USERNAME:batch}
+    password: ${DB_PASSWORD:batch}
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+  flyway:
+    enabled: true
+  batch:
+    job:
+      enabled: false            # jobs are started by the API / scheduler / Control-M, never at boot
+    jdbc:
+      initialize-schema: always # creates Spring Batch metadata tables if missing
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      repositories:
+        enabled: false
+  cache:
+    type: redis
+
+engine:
+  input-base-dir: ${ENGINE_INPUT_DIR:./sample-data}
+  chunk-size: 500
+  grid-size: 4
+  skip-limit: 1000
+  cache:
+    fx-rates-ttl: PT1H
+  scheduler:
+    enabled: ${ENGINE_SCHEDULER_ENABLED:false}
+    daily-feed-cron: "0 0 6 * * MON-FRI"
+    zone: Europe/London
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    com.rajkumar.batchengine: INFO
