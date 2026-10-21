@@ -1,0 +1,38 @@
+{
+  "FIN_DAILY_FEED": {
+    "Type": "Folder",
+    "ControlmServer": "CTM_SERVER",
+    "Description": "Daily transaction feed processing via the batch engine REST API",
+    "OrderMethod": "Automatic",
+    "DAILY_FEED_PROCESS": {
+      "Type": "Job:Command",
+      "Command": "/opt/batch-engine/controlm/run_feed_job.sh %%$ODATE",
+      "Host": "batch-host-01",
+      "RunAs": "batchusr",
+      "Application": "FINANCE",
+      "SubApplication": "DAILY_FEED",
+      "Description": "Validate, convert and load the day's transaction feeds",
+      "When": {
+        "WeekDays": ["MON", "TUE", "WED", "THU", "FRI"],
+        "FromTime": "0600"
+      },
+      "Rerun": {
+        "Times": "2",
+        "Every": "10"
+      },
+      "eventsToWaitFor": {
+        "Type": "WaitForEvents",
+        "Events": [{ "Event": "FEED_FILES_ARRIVED-%%ODATE" }]
+      },
+      "eventsToAdd": {
+        "Type": "AddEvents",
+        "Events": [{ "Event": "DAILY_FEED_LOADED-%%ODATE" }]
+      },
+      "Notify": {
+        "Type": "Notify:NotOK",
+        "Message": "Daily feed job failed for %%$ODATE - check /api/v1/audit",
+        "Destination": "batch-support"
+      }
+    }
+  }
+}

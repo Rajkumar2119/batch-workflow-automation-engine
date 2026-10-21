@@ -1,0 +1,41 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: batchengine
+      POSTGRES_USER: batch
+      POSTGRES_PASSWORD: batch
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U batch -d batchengine"]
+      interval: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 10
+
+  batch-engine:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/batchengine
+      DB_USERNAME: batch
+      DB_PASSWORD: batch
+      REDIS_HOST: redis
+      ENGINE_INPUT_DIR: /data/inbound
+      ENGINE_SCHEDULER_ENABLED: "false"
+    volumes:
+      - ./sample-data:/data/inbound:ro
+    ports:
+      - "8080:8080"
